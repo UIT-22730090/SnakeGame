@@ -44,7 +44,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		super.paintComponent(g);
 		draw(g);
 	}
-
+	
 	public void draw(Graphics g) {
 
 		if(running) {
@@ -81,7 +81,7 @@ public class GamePanel extends JPanel implements ActionListener {
 		appleY = random.nextInt((int) (SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
 
 	}
-
+	// Hàm di chuyển của rắn
 	public void move() {
 		for(int i = bodyParts; i > 0; i--) {
 			x[i] = x[i-1];
