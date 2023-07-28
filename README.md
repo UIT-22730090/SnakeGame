@@ -1,7 +1,8 @@
 # SnakeGame
 <p>A simple snake game in java</p>
 
-<img width="478" alt="image" src="https://github.com/UIT-22730090/SnakeGame/assets/139667613/fb53aab8-0047-4116-a618-147858341b22">
+<img width="449" alt="image" src="https://github.com/UIT-22730090/SnakeGame/assets/139667613/a3cdc389-7133-490a-9e2c-81d13faccec1">
+
 
 <h2>How To Play</h2>
 
