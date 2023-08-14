@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
+
     private static final int SCREEN_WIDTH = 600;
     private static final int SCREEN_HEIGHT = 600;
     private static final int UNIT_SIZE = 25;
-    private static final int GAME_UNITS = (SCREEN_WIDTH * SCREEN_HEIGHT) / UNIT_SIZE;
     private static int DELAY;
 
     private final ArrayList<Integer> snakeX = new ArrayList<>();
@@ -20,6 +20,7 @@ public class GamePanel extends JPanel implements ActionListener {
     private boolean gameOver = false; // Flag to indicate game over
     private Timer timer;
     private final Random random = new Random();
+    private int score = 0;
 
     public GamePanel(Difficulty difficulty) {
         setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -27,20 +28,19 @@ public class GamePanel extends JPanel implements ActionListener {
         setFocusable(true);
         addKeyListener(new MyKeyAdapter());
         // Set the delay based on the difficulty level
-        switch (difficulty) {
-            case EASY:
-                DELAY = 200; // Adjust this value for the desired speed
-                break;
-            case MEDIUM:
-                DELAY = 75;  // Adjust this value for the desired speed
-                break;
-            case HARD:
-                DELAY = 10;  // Adjust this value for the desired speed
-                break;
-            default:
-                DELAY = 75;  // Default to medium speed
-                break;
-        }
+        DELAY = switch (difficulty) {
+            case EASY ->
+                150;
+            case MEDIUM ->
+                85;
+            case HARD ->
+                50;
+            default ->
+                75;
+        }; // Adjust this value for the desired speed
+        // Adjust this value for the desired speed
+        // Adjust this value for the desired speed
+        // Default to medium speed
 
         timer = new Timer(DELAY, this);
         startGame();
@@ -77,47 +77,46 @@ public class GamePanel extends JPanel implements ActionListener {
 
         // Move the snake's head based on the direction
         switch (direction) {
-            case 'U':
+            case 'U' ->
                 snakeY.set(0, snakeY.get(0) - UNIT_SIZE);
-                break;
-            case 'D':
+            case 'D' ->
                 snakeY.set(0, snakeY.get(0) + UNIT_SIZE);
-                break;
-            case 'L':
+            case 'L' ->
                 snakeX.set(0, snakeX.get(0) - UNIT_SIZE);
-                break;
-            case 'R':
+            case 'R' ->
                 snakeX.set(0, snakeX.get(0) + UNIT_SIZE);
-                break;
         }
     }
 
     private void checkApple() {
         if (snakeX.get(0) == appleX && snakeY.get(0) == appleY) {
-            snakeX.add(appleX);
-            snakeY.add(appleY);
+            score++;
+            int TailX = snakeX.get(snakeX.size() - 1);
+            int TailY = snakeY.get(snakeY.size() - 1);
+            snakeX.add(TailX);
+            snakeY.add(TailY);
             newApple();
         }
     }
 
     private void checkCollisions() {
-    // Check collision with walls or itself
-    for (int i = snakeX.size() - 1; i > 0; i--) {
-        if (snakeX.get(0).equals(snakeX.get(i)) && snakeY.get(0).equals(snakeY.get(i))) {
+
+        for (int i = 2; i < snakeX.size(); i++) {
+            if (snakeX.get(0).equals(snakeX.get(i)) && snakeY.get(0).equals(snakeY.get(i))) {
+                gameOver = true;
+                running = false;
+                break;
+            }
+        }
+
+        if (snakeX.get(0) < 0 || snakeX.get(0) >= SCREEN_WIDTH || snakeY.get(0) < 0 || snakeY.get(0) >= SCREEN_HEIGHT) {
             gameOver = true;  // Set the gameOver flag to true
             running = false;
-            break;
         }
-    }
 
-    if (snakeX.get(0) < 0 || snakeX.get(0) >= SCREEN_WIDTH || snakeY.get(0) < 0 || snakeY.get(0) >= SCREEN_HEIGHT) {
-        gameOver = true;  // Set the gameOver flag to true
-        running = false;
-    }
-
-    if (!running) {
-        timer.stop();
-        }
+        /*if (!running) {
+            timer.stop();
+        }*/
     }
 
     private void newApple() {
@@ -133,6 +132,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
     private void draw(Graphics g) {
         if (running) {
+            g.setColor(Color.white);
+            g.setFont(new Font("Ink Free", Font.BOLD, 30));
+            g.drawString("Score: " + score, 10, 30);
             g.setColor(Color.red);
             g.fillOval(appleX, appleY, UNIT_SIZE, UNIT_SIZE);
 
@@ -154,12 +156,9 @@ public class GamePanel extends JPanel implements ActionListener {
             if (gameOver) {
                 JButton playAgainButton = new JButton("Play Again");
                 playAgainButton.setBounds((SCREEN_WIDTH - 100) / 2, (SCREEN_HEIGHT + metrics.getHeight()) / 2, 100, 40);
-                playAgainButton.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        // Restart the game
-                        restartGame();
-                    }
+                playAgainButton.addActionListener((ActionEvent e) -> {
+                    // Restart the game
+                    restartGame();
                 });
                 add(playAgainButton);
             }
@@ -167,7 +166,10 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     private void restartGame() {
-        // Reset all necessary game variables and start a new game
+        // Remove the "Play Again" button
+        removePlayAgainButton();
+
+        // Reset all necessary game variables
         newApple();
         snakeX.clear();
         snakeY.clear();
@@ -175,11 +177,29 @@ public class GamePanel extends JPanel implements ActionListener {
         snakeY.add(SCREEN_HEIGHT / 2);
         running = true;
         gameOver = false;
+        score = 0; // Reset the score
         timer.start();
+
+        // Stop the current timer and repaint the panel
+        //timer.stop();
+        setFocusable(true); // Make sure the panel is focusable
+        addKeyListener(new MyKeyAdapter()); // Add the key listener
         repaint();
+
+    }
+
+    private void removePlayAgainButton() {
+        // Remove the "Play Again" button if it exists
+        Component[] components = getComponents();
+        for (Component component : components) {
+            if (component instanceof JButton) {
+                remove(component);
+            }
+        }
     }
 
     private class MyKeyAdapter extends KeyAdapter {
+
         @Override
         public void keyPressed(KeyEvent e) {
             int key = e.getKeyCode();
