@@ -47,7 +47,7 @@ public class GamePanel extends JPanel implements ActionListener {
         timer = new Timer(DELAY, this);
         startGame();
     }
-
+//Hàm bắt đàu game
     private void startGame() {
         newApple();
         snakeX.clear();
@@ -59,7 +59,7 @@ public class GamePanel extends JPanel implements ActionListener {
         timer = new Timer(DELAY, this);
         timer.start();
     }
-
+    // thực hiện hành đông
     @Override
     public void actionPerformed(ActionEvent e) {
         if (running) {
@@ -120,7 +120,7 @@ public class GamePanel extends JPanel implements ActionListener {
             timer.stop();
         }*/
     }
-
+    //Xuất hiện táo ngẫu nhiên
     private void newApple() {
         appleX = random.nextInt((SCREEN_WIDTH / UNIT_SIZE)) * UNIT_SIZE;
         appleY = random.nextInt((SCREEN_HEIGHT / UNIT_SIZE)) * UNIT_SIZE;
